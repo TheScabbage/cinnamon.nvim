@@ -104,7 +104,7 @@ local scroll_screen = function(delay_length, target_line)
 
   -- Scroll the cursor up.
   while vim.fn.winline() > target_line do
-    local delta = vim.fn.winline() - targen_line
+    local delta = vim.fn.winline() - target_line
     vim.cmd('norm! ' .. t('<C-e>'))
     local new_line = vim.fn.winline()
     create_delay(delay_length / delta * 4)
