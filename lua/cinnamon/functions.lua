@@ -104,9 +104,10 @@ local scroll_screen = function(delay_length, target_line)
 
   -- Scroll the cursor up.
   while vim.fn.winline() > target_line do
+    local delta = vim.fn.winline() - targen_line
     vim.cmd('norm! ' .. t('<C-e>'))
     local new_line = vim.fn.winline()
-    create_delay(delay_length)
+    create_delay(delay_length / delta * 4)
     if new_line == prev_line then
       break
     end
@@ -115,9 +116,10 @@ local scroll_screen = function(delay_length, target_line)
 
   -- Scroll the cursor down.
   while vim.fn.winline() < target_line do
+    local delta = target_line - vim.fn.winline()
     vim.cmd('norm! ' .. t('<C-y>'))
     local new_line = vim.fn.winline()
-    create_delay(delay_length)
+    create_delay(delay_length / delta * 4)
     if new_line == prev_line then
       break
     end
@@ -137,6 +139,7 @@ local scroll_down = function(curpos, scroll_win, delay_length, scrolloff)
 
   -- Scroll.
   while vim.fn.getcurpos()[2] < lnum do
+    local delta = lnum - vim.fn.getcurpos()[2]
     -- Check if movement ends in the current fold.
     if vim.fn.foldclosedend('.') ~= -1 and vim.fn.foldclosedend('.') > lnum then
       vim.fn.setpos('.', curpos)
@@ -167,7 +170,7 @@ local scroll_down = function(curpos, scroll_win, delay_length, scrolloff)
       break
     end
 
-    create_delay(delay_length)
+    create_delay(delay_length / delta * 4)
   end
 end
 
@@ -183,6 +186,7 @@ local scroll_up = function(curpos, scroll_win, delay_length, scrolloff)
 
   -- Scroll.
   while vim.fn.getcurpos()[2] > lnum do
+    local delta = vim.fn.getcurpos()[2] - lnum
     -- Check if movement ends in the current fold.
     if vim.fn.foldclosed('.') ~= -1 and vim.fn.foldclosed('.') < lnum then
       vim.fn.setpos('.', curpos)
@@ -213,7 +217,7 @@ local scroll_up = function(curpos, scroll_win, delay_length, scrolloff)
       break
     end
 
-    create_delay(delay_length)
+    create_delay(delay_length / delta * 4)
   end
 end
 
@@ -248,8 +252,13 @@ fn.scroll_wheel_vertically = function(command, distance, curpos, winline, delay_
   local lnum = curpos[2]
 
   if command == t('<ScrollWheelDown>') then
+    local curDelta = lnum - vim.fn.getcurpos()[2]
+    if curDelta < 0 then
+      curDelta = vim.fn.winline() - winline
+    end
+
     -- Scroll down.
-    while vim.fn.getcurpos()[2] < lnum or vim.fn.winline() > winline do
+    while curDelta > 0 do
       -- Check if movement ends in the current fold.
       if vim.fn.foldclosedend('.') ~= -1 and vim.fn.foldclosedend('.') > lnum then
         vim.fn.setpos('.', curpos)
@@ -286,11 +295,12 @@ fn.scroll_wheel_vertically = function(command, distance, curpos, winline, delay_
         break
       end
 
-      create_delay(delay_length)
+      create_delay(delay_length / curDelta * 4)
     end
   elseif command == t('<ScrollWheelUp>') then
     -- Scroll up.
     while vim.fn.getcurpos()[2] > lnum or vim.fn.winline() < winline do
+      local delta = vim.fn.getcurpos()[2] - lnum
       -- Check if movement ends in the current fold.
       if vim.fn.foldclosedend('.') ~= -1 and vim.fn.foldclosedend('.') < lnum then
         vim.fn.setpos('.', curpos)
@@ -307,7 +317,7 @@ fn.scroll_wheel_vertically = function(command, distance, curpos, winline, delay_
         break
       end
 
-      create_delay(delay_length)
+      create_delay(delay_length / delta * 4)
     end
   end
 end
@@ -322,7 +332,7 @@ fn.scroll_horizontally = function(column, wincol, delay_length)
     local prev_column = vim.fn.getcurpos()[3]
     while vim.fn.getcurpos()[3] < column do
       vim.cmd('norm! l')
-      create_delay(delay_length)
+      create_delay(delay_length / delta * 4)
       if vim.fn.getcurpos()[3] == prev_column then
         break
       end
@@ -351,6 +361,7 @@ fn.scroll_horizontally = function(column, wincol, delay_length)
     end
 
     while vim.fn.wincol() < wincol do
+      local delta = wincol - vim.fn.wincol()
       vim.cmd('norm! zh')
       local new_wincol = vim.fn.wincol()
       create_delay(delay_length)
