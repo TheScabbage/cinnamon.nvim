@@ -331,6 +331,7 @@ fn.scroll_horizontally = function(column, wincol, delay_length)
   if column ~= -1 then
     local prev_column = vim.fn.getcurpos()[3]
     while vim.fn.getcurpos()[3] < column do
+      local delta = column - vim.fn.getcurpos()[3]
       vim.cmd('norm! l')
       create_delay(delay_length / delta * 4)
       if vim.fn.getcurpos()[3] == prev_column then
@@ -338,8 +339,9 @@ fn.scroll_horizontally = function(column, wincol, delay_length)
       end
     end
     while vim.fn.getcurpos()[3] > column do
+      local delta = column - vim.fn.getcurpos()[3]
       vim.cmd('norm! h')
-      create_delay(delay_length)
+      create_delay(delay_length / delta * 4)
       if vim.fn.getcurpos()[3] == prev_column then
         break
       end
@@ -351,9 +353,10 @@ fn.scroll_horizontally = function(column, wincol, delay_length)
     local prev_wincol = vim.fn.wincol()
 
     while vim.fn.wincol() > wincol do
+      local delta = vim.fn.wincol() - wincol
       vim.cmd('norm! zl')
       local new_wincol = vim.fn.wincol()
-      create_delay(delay_length)
+      create_delay(delay_length / delta * 4)
       if new_wincol == prev_wincol then
         break
       end
@@ -364,7 +367,7 @@ fn.scroll_horizontally = function(column, wincol, delay_length)
       local delta = wincol - vim.fn.wincol()
       vim.cmd('norm! zh')
       local new_wincol = vim.fn.wincol()
-      create_delay(delay_length)
+      create_delay(delay_length / delta * 4)
       if new_wincol == prev_wincol then
         break
       end
