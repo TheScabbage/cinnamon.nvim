@@ -4,6 +4,8 @@ local config = require('cinnamon.config')
 local utils = require('cinnamon.utils')
 local motions = require('cinnamon.motions')
 
+local speedMul = 6
+
 fn.check_command_errors = function(command)
   -- If no search pattern, return an error if using a repeat search command.
   if vim.tbl_contains(motions.search_repeat, command) then
@@ -107,7 +109,7 @@ local scroll_screen = function(delay_length, target_line)
     local delta = vim.fn.winline() - target_line
     vim.cmd('norm! ' .. t('<C-e>'))
     local new_line = vim.fn.winline()
-    create_delay(delay_length / delta * 4)
+    create_delay(delay_length / delta * speedMul)
     if new_line == prev_line then
       break
     end
@@ -119,7 +121,7 @@ local scroll_screen = function(delay_length, target_line)
     local delta = target_line - vim.fn.winline()
     vim.cmd('norm! ' .. t('<C-y>'))
     local new_line = vim.fn.winline()
-    create_delay(delay_length / delta * 4)
+    create_delay(delay_length / delta * speedMul)
     if new_line == prev_line then
       break
     end
@@ -170,7 +172,7 @@ local scroll_down = function(curpos, scroll_win, delay_length, scrolloff)
       break
     end
 
-    create_delay(delay_length / delta * 4)
+    create_delay(delay_length / delta * speedMul)
   end
 end
 
@@ -217,7 +219,7 @@ local scroll_up = function(curpos, scroll_win, delay_length, scrolloff)
       break
     end
 
-    create_delay(delay_length / delta * 4)
+    create_delay(delay_length / delta * speedMul)
   end
 end
 
@@ -295,7 +297,7 @@ fn.scroll_wheel_vertically = function(command, distance, curpos, winline, delay_
         break
       end
 
-      create_delay(delay_length / curDelta * 4)
+      create_delay(delay_length / curDelta * speedMul)
     end
   elseif command == t('<ScrollWheelUp>') then
     -- Scroll up.
@@ -317,7 +319,7 @@ fn.scroll_wheel_vertically = function(command, distance, curpos, winline, delay_
         break
       end
 
-      create_delay(delay_length / delta * 4)
+      create_delay(delay_length / delta * speedMul)
     end
   end
 end
@@ -333,7 +335,7 @@ fn.scroll_horizontally = function(column, wincol, delay_length)
     while vim.fn.getcurpos()[3] < column do
       local delta = column - vim.fn.getcurpos()[3]
       vim.cmd('norm! l')
-      create_delay(delay_length / delta * 4)
+      create_delay(delay_length / delta * speedMul)
       if vim.fn.getcurpos()[3] == prev_column then
         break
       end
@@ -341,7 +343,7 @@ fn.scroll_horizontally = function(column, wincol, delay_length)
     while vim.fn.getcurpos()[3] > column do
       local delta = column - vim.fn.getcurpos()[3]
       vim.cmd('norm! h')
-      create_delay(delay_length / delta * 4)
+      create_delay(delay_length / delta * speedMul)
       if vim.fn.getcurpos()[3] == prev_column then
         break
       end
@@ -356,7 +358,7 @@ fn.scroll_horizontally = function(column, wincol, delay_length)
       local delta = vim.fn.wincol() - wincol
       vim.cmd('norm! zl')
       local new_wincol = vim.fn.wincol()
-      create_delay(delay_length / delta * 4)
+      create_delay(delay_length / delta * speedMul)
       if new_wincol == prev_wincol then
         break
       end
@@ -367,7 +369,7 @@ fn.scroll_horizontally = function(column, wincol, delay_length)
       local delta = wincol - vim.fn.wincol()
       vim.cmd('norm! zh')
       local new_wincol = vim.fn.wincol()
-      create_delay(delay_length / delta * 4)
+      create_delay(delay_length / delta * speedMul)
       if new_wincol == prev_wincol then
         break
       end
