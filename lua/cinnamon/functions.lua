@@ -4,7 +4,7 @@ local config = require('cinnamon.config')
 local utils = require('cinnamon.utils')
 local motions = require('cinnamon.motions')
 
-local speedMul = 6
+local speedMul = 5
 
 fn.check_command_errors = function(command)
   -- If no search pattern, return an error if using a repeat search command.
