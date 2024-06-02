@@ -86,7 +86,8 @@ local create_delay = function(delay_length)
     return
   end
   delay_length = math.floor(delay_length)
-  if delay_length == 0 then
+
+  if delay_length <= 0 then
     delay_length = 1
   end
 
