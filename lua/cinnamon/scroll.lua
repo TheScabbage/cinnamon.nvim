@@ -8,6 +8,9 @@ local motions = require('cinnamon.motions')
 local saved_guicursor = vim.opt.guicursor:get()
 local warning_given = false
 
+LastScrollTime = 0
+SpamMultiplier = 1
+
 M.scroll = function(command, scroll_win, use_count, delay_length, deprecated_arg)
   -- Check if plugin is disabled.
   if config.disabled then
@@ -131,11 +134,29 @@ M.scroll = function(command, scroll_win, use_count, delay_length, deprecated_arg
   end
 
   -- Calculate the delay length.
+  local scrollTime = os.time()
+  local hitDelta = scrollTime - LastScrollTime
+  local spammed = hitDelta < 0.2
+  local shouldReset = hitDelta > 0.5
+  LastScrollTime = scrollTime
+
+  if spammed then
+    SpamMultiplier = SpamMultiplier * 2
+  end
+
+  if shouldReset then
+    SpamMultiplier = 1
+  end
+
+  print(SpamMultiplier)
+
   if config.max_length ~= -1 then
     if math.abs(distance) * delay_length > config.max_length then
       delay_length = math.floor((config.max_length / math.abs(distance)) + 0.5)
     end
   end
+
+  delay_length = delay_length / SpamMultiplier
 
   -- Scroll vertically.
   if scroll_wheel then
@@ -148,7 +169,7 @@ M.scroll = function(command, scroll_win, use_count, delay_length, deprecated_arg
 
   -- Scroll horizontally.
   if
-    (scrolled_view_horizontally and config.horizontal_scroll or config.always_scroll) and vim.fn.foldclosed('.') == -1
+      (scrolled_view_horizontally and config.horizontal_scroll or config.always_scroll) and vim.fn.foldclosed('.') == -1
   then
     fn.scroll_horizontally(column, wincol, math.ceil(delay_length / 3))
   else
@@ -159,7 +180,6 @@ M.scroll = function(command, scroll_win, use_count, delay_length, deprecated_arg
   if cursor_hidden then
     vim.opt.guicursor = saved_guicursor
   end
-
   restore_options()
 end
 
